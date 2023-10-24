@@ -1,3 +1,4 @@
+//게임, 게임 시작, 공격, 스킬, 몬스터 공격, 레벨업, 스탯 표시, 게임 종료
 const $input = document.querySelector("#player-input");
 const $name = document.querySelector("#player-name");
 const $WrongInput = document.querySelector("#wrong-input");
@@ -9,17 +10,17 @@ let player; //플레이어 정보가 담긴 객체, json으로 변환 후 저장
 const playerStats = {
   lv1: {
     maxHp: 150,
-    at: 15,
+    att: 15,
     mp: 10,
   },
   lv2: {
     maxHp: 250,
-    at: 20,
+    att: 20,
     mp: 15,
   },
   lv3: {
     hp: 360,
-    at: 25,
+    att: 25,
     mp: 25,
   },
 }
@@ -27,29 +28,29 @@ const teachers = {
   BonSu: {
     lv1: {
       maxHp: 120,
-      at: 15,
+      att: 15,
       mp: 20,
     },
     lv2: {
       maxHp: 250,
-      at: 20,
+      att: 20,
       mp: 30,
     },
     lv3: {
       hp: 300,
-      at: 25,
+      att: 25,
       mp: 35,
     },
   },
   DoRan: {
     lv1: {
       maxHp: 150,
-      at: 15,
+      att: 15,
       mp: 15,
     },
     lv2: {
       maxHp: 250,
-      at: 20,
+      att: 20,
       mp: 25,
     },
   },
@@ -66,6 +67,9 @@ const teachers = {
 
   // }
 };
+const checkInput = (input) => {
+  if (input[0] === "!") return true;
+}
 class Unit { // 버프/디버프 적용 전
   constructor(game, name, maxHp, att, mp) {
     this.game = game;
@@ -105,7 +109,7 @@ class Unit { // 버프/디버프 적용 전
         increaseAllDamageByEtc: 0, //전피증(기타)
       }
     }
-    this.temporaryBuff = { // 임시 버프, 스탯, 남은 턴으로 나타냄, 특정 쌤을 만날 때 프로퍼티를 추가하고 끝날 때 이 값으로 초기화
+    this.temporaryBuffs = { // 임시 버프, 스탯, 남은 턴으로 나타냄, 특정 쌤을 만날 때 프로퍼티를 추가하고 끝날 때 이 값으로 초기화
       //ex) 본수를 만날 때 깜지, 청소 추가
       regenMpPerTurn_absolute: [0, 0], //턴당 마나 회복(절댓값)
       reduceWasteMp: [0, 0], //스킬 마나 소모 감소(비율)
@@ -130,27 +134,80 @@ class Player extends Unit {
     this.name = name
     this.level = level;
     this.stage = new Object();
-    this.gold = 0;
+    this.rss = 0;
     this.item = {
+      state: "unlocked",
       item: {},
       wearing: {}
     };
+    this.technology = {state: "unlocked"};
     this.slain = new Object(); // 쌤들을 처치한 횟수
     this.diedby = new Object(); // 쌤들한테 죽은 횟수
     this.class = "땡땡이";
   }
 };
+
+class Teacher extends Unit {
+  constructor(game, name, level) {
+    const stats = teachers[name][`lv${level}`];
+    super(game, name, stats.maxHp, stats.att, stats.mp);
+    this.name = name
+    this.level = level;
+}
+};
+
 class Game {
   constructor(name) {
     this.teacher = null; // 이 게임에서 사용할 선생
-    this.player = null; // 이 게임에서 
+    this.player = null; // 이 게임에서 사용할 학생 
+    this.gameStarts();
+  }
+  gameStarts() {
+    $input.addEventListener('submit', this.playerInput);
+  }
+  playerInput = event => {
+    event.preventDefault();
+    const $playerInput = event.target[0];
+    if (!checkInput($playerInput.value)) { $playerInput.value = ''; $playerInput.focus(); return; } // 입력값 검사 후 유효하지 않다면 리턴
+    const msg = $playerInput.value;
+    if(msg === "!조지기") {
+      if(!this.teacher) {
+        this.battle();
+      }
+    } else if(msg === "!공격") {
+      console.log(`레벨 ${this.teacher.level} ${this.teacher.name}
+    최대 체력: ${this.teacher.maxHp}
+    공격력: ${this.teacher.att}
+    마나: ${this.teacher.mp}`);
+    } else if(msg === "!발작") {
 
+    }
+    $gamelog.innerHTML += `<br>${$playerInput.value}`;
+    $playerInput.value = '!';
+    $playerInput.focus();
+  }
+  battle = () => {
+    const teacherCodes = {0: "BonSu", 1: "DoRan"};
+    const randomTeacherCode = teacherCodes[Math.floor(Math.random() * 2)];
+    this.teacher = new Teacher(this, randomTeacherCode, 1);
+    this.player = new Player(this, playerName, 1);
+    if(this.player.technology.state !== "unlocked") {
+      console.log("연구 어캐했노");
+    }
+    if(this.player.item.state !== "unlocked") {
+      console.log("무기 어캐했노");
+    }
+    console.log(`레벨 ${this.player.level} ${this.player.name}
+    최대 체력: ${this.player.maxHp}
+    공격력: ${this.player.att}
+    마나: ${this.player.mp}`);
+    console.log(`레벨 ${this.teacher.level} ${this.teacher.name}
+    최대 체력: ${this.teacher.maxHp}
+    공격력: ${this.teacher.att}
+    마나: ${this.teacher.mp}`);
   }
 };
 
-const checkInput = (input) => {
-  if (input[0] === "!") return true;
-}
 // const DD2 = new makePlayerInfo("땡땡이", 1);
 // console.log(DD2)
 $name.addEventListener('submit', event => {
@@ -167,13 +224,5 @@ $name.addEventListener('submit', event => {
   $name.style.display = 'none';
   $input.style.display = 'block';
   $gamelog.innerHTML = `닉네임: ${playerName}`
-});
-
-$input.addEventListener('submit', event => {
-  event.preventDefault();
-  const $playerInput = event.target[0];
-  if (!checkInput($playerInput.value)) { $playerInput.value = ''; $playerInput.focus(); return; } // 입력값 검사 후 유효하지 않다면 리턴
-  $gamelog.innerHTML += `<br>${$playerInput.value}`;
-  $playerInput.value = '!';
-  $playerInput.focus();
+  const game = new Game(playerName);
 });
