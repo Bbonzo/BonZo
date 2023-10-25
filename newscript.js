@@ -302,10 +302,10 @@ class Game {
           console.log(`청소 효과가 ${this.player.cleaning !== 0 ? `${this.player.cleaning}턴 남았습니다.` : "제거되었습니다."}`);
           console.log(`${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}`);
         }
+        if(this.player.hp <= 0) {
+          console.log(`${this.teacherName}는 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했다!`);
+          this.reset();
       }
-      if(this.player.hp <= 0) {
-        console.log(`${teacherName}는 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했다!`);
-        this.reset();
       }
     } else if (this.teacherName === "도란이") {
 
