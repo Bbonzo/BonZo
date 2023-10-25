@@ -196,7 +196,7 @@ class Game {
         // 공격력: ${this.teacher.att}
         // 마나: ${this.teacher.mp}`);
       } else if (msg === "발작") {
-        if (this.player.mp <= 5) {
+        if (this.player.mp < 5) {
           console.log(`마나가 부족합니다. 현재 마나: ${this.player.mp}`);
         } else {
           turn++;
