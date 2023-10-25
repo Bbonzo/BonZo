@@ -4,8 +4,7 @@ const $name = document.querySelector("#player-name");
 const $WrongInput = document.querySelector("#wrong-input");
 const $gamelog = document.querySelector("#game-log span");
 let playerName = null;
-const commands = new Array();
-commands.push("조지기", "레벨", "")
+const $commands = a = document.querySelector("#select-command");
 let player; //플레이어 정보가 담긴 객체, json으로 변환 후 저장
 const playerStats = {
   lv1: {
@@ -68,7 +67,7 @@ const teachers = {
   // }
 };
 const checkInput = (input) => {
-  if (input[0] === "!") return true;
+  return true;
 }
 class Unit { // 버프/디버프 적용 전
   constructor(game, name, maxHp, att, mp) {
@@ -140,7 +139,7 @@ class Player extends Unit {
       item: {},
       wearing: {}
     };
-    this.technology = {state: "unlocked"};
+    this.technology = { state: "unlocked" };
     this.slain = new Object(); // 쌤들을 처치한 횟수
     this.diedby = new Object(); // 쌤들한테 죽은 횟수
     this.class = "땡땡이";
@@ -153,7 +152,7 @@ class Teacher extends Unit {
     super(game, name, stats.maxHp, stats.att, stats.mp);
     this.name = name
     this.level = level;
-}
+  }
 };
 
 class Game {
@@ -167,34 +166,40 @@ class Game {
   }
   playerInput = event => {
     event.preventDefault();
-    const $playerInput = event.target[0];
+    const $playerInput = event.target[1];
     if (!checkInput($playerInput.value)) { $playerInput.value = ''; $playerInput.focus(); return; } // 입력값 검사 후 유효하지 않다면 리턴
     const msg = $playerInput.value;
-    if(msg === "!조지기") {
-      if(!this.teacher) {
-        this.battle();
-      }
-    } else if(msg === "!공격") {
-      console.log(`레벨 ${this.teacher.level} ${this.teacher.name}
-    최대 체력: ${this.teacher.maxHp}
-    공격력: ${this.teacher.att}
-    마나: ${this.teacher.mp}`);
-    } else if(msg === "!발작") {
+    if ($commands.options[0].selected === true) {
+      if (msg === "조지기") {
+        if (!this.teacher) {
+          this.battle();
+        } else if (this.teacher) { //선생이 존재한다면
+          console.log("이미 플레이 중입니다.");
+        }
+      } else if (msg === "공격") {
+        console.log(`레벨 ${this.teacher.level} ${this.teacher.name}
+        최대 체력: ${this.teacher.maxHp}
+        공격력: ${this.teacher.att}
+        마나: ${this.teacher.mp}`);
+      } else if (msg === "발작") {
 
+      } else if (msg === "청소째기") {
+        
+      }
     }
     $gamelog.innerHTML += `<br>${$playerInput.value}`;
-    $playerInput.value = '!';
+    $playerInput.value = '';
     $playerInput.focus();
   }
   battle = () => {
-    const teacherCodes = {0: "BonSu", 1: "DoRan"};
+    const teacherCodes = { 0: "BonSu", 1: "DoRan" };
     const randomTeacherCode = teacherCodes[Math.floor(Math.random() * 2)];
     this.teacher = new Teacher(this, randomTeacherCode, 1);
     this.player = new Player(this, playerName, 1);
-    if(this.player.technology.state !== "unlocked") {
+    if (this.player.technology.state !== "unlocked") {
       console.log("연구 어캐했노");
     }
-    if(this.player.item.state !== "unlocked") {
+    if (this.player.item.state !== "unlocked") {
       console.log("무기 어캐했노");
     }
     console.log(`레벨 ${this.player.level} ${this.player.name}
@@ -214,8 +219,8 @@ $name.addEventListener('submit', event => {
   event.preventDefault();
   playerName = event.target[0].value;
   const regex = /^[ㄱ-ㅎ|가-힣|0-9|]+$/;
-  if(!playerName) return;//입력값이 없다면 리턴
-  if(!regex.test(playerName) || playerName.length > 6) { // 한글,숫자가 아니거나 입력값이 6글자보다 크면
+  if (!playerName) return;//입력값이 없다면 리턴
+  if (!regex.test(playerName) || playerName.length > 6) { // 한글,숫자가 아니거나 입력값이 6글자보다 크면
     $WrongInput.innerText = '한글,숫자로 구성된 6글자 이하 닉네임만 가능합니다.'
     playerName = null;
     event.target[0].value = '';
@@ -225,4 +230,5 @@ $name.addEventListener('submit', event => {
   $input.style.display = 'block';
   $gamelog.innerHTML = `닉네임: ${playerName}`
   const game = new Game(playerName);
+  $input["command"].focus();
 });
