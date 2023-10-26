@@ -182,6 +182,7 @@ class Game {
       }
     } else {
       $details.innerHTML = `이번 턴에는 특별한 전달사항이 없습니다.`;
+      showOrDelete = 1;
     }
   }
   playerInput = event => {
@@ -263,7 +264,7 @@ class Game {
         a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
         $gamelog.append(a);
         detail[turn] += `${this.teacherName}가 교무실로 돌아가셨습니다.`
-        if ($details.innerText.indexOf("[세부사항]") !== -1) {
+        if (showOrDelete === 1) {
           $details.innerText = `[세부사항]
                 ` + detail[a.id] + `
                 세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
@@ -295,7 +296,7 @@ class Game {
               a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
               $gamelog.append(a);
               detail[turn] += `<p>${teacherName}가 교무실로 돌아가셨습니다.</p>`
-              if ($details.innerText.indexOf("[세부사항]") !== -1) {
+              if (showOrDelete === 1) {
                 $details.innerText = `[세부사항]
                 ` + detail[a.id] + `
                 세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
@@ -384,13 +385,13 @@ class Game {
         a.id = `${turn}`;
         a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
         $gamelog.append(a);
-        if ($details.innerText.indexOf("[세부사항]") !== -1) {
+        if (showOrDelete === 1) {
           $details.innerText = `[세부사항]
       ` + detail[a.id] + `
       세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
         }
         if (this.player.hp <= 0) {
-          if ($details.innerText.indexOf("[세부사항]") !== -1) {
+          if (showOrDelete === 1) {
             $details.innerText = `[세부사항]
             ` + detail[a.id] + `${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!
             세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.
