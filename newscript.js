@@ -170,16 +170,20 @@ class Game {
     $gamelog.addEventListener('click', this.showDetails);
   }
   showDetails = (event) => {
-    if(showOrDelete === 0) {
-      $details.innerText = `[세부사항]
-    ` + detail[event.target.id] + `
-    세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`
-    showOrDelete = 1;
-  } else {
-    $details.innerHTML = `세부사항을 보려면 로그를 클릭해 주세요.`;
-    showOrDelete = 0;
-  }
+    if (detail[event.target.id]) {
+      if (showOrDelete === 0) {
+        $details.innerText = `[세부사항]
+      ` + detail[event.target.id] + `
+      세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`
+        showOrDelete = 1;
+      } else {
+        $details.innerHTML = `세부사항을 보려면 로그를 클릭해 주세요.`;
+        showOrDelete = 0;
+      }
+    } else {
+      $details.innerHTML = `이번 턴에는 특별한 전달사항이 없습니다.`;
     }
+  }
   playerInput = event => {
     event.preventDefault();
     const $playerInput = event.target[1];
@@ -195,7 +199,6 @@ class Game {
           console.log("이미 플레이 중입니다.");
         }
       } else if (msg === "공격") {
-        $details.innerHTML = `세부사항을 보려면 로그를 클릭해 주세요.`
         turn++;
         console.log(`${turn}턴 시작`);
         this.whenAA();
@@ -208,7 +211,7 @@ class Game {
         if (this.player.mp < 5) {
           console.log(`마나가 부족합니다. 현재 마나: ${this.player.mp}`);
         } else {
-          $details.innerHTML = `세부사항을 보려면 로그를 클릭해 주세요.`
+
           turn++;
           console.log(`${turn}턴 시작`);
           this.whenUseSkill(0);
@@ -255,10 +258,20 @@ class Game {
       if (this.teacher.hp > 0) {
         this.teachersCounterAttack();
       } else { // 사망 시
+        const a = document.createElement("p");
+        a.id = `${turn}`;
+        a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
+        $gamelog.append(a);
+        detail[turn] += `${this.teacherName}가 교무실로 돌아가셨습니다.`
+        if ($details.innerText.indexOf("[세부사항]") !== -1) {
+          $details.innerText = `[세부사항]
+                ` + detail[a.id] + `
+                세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
+        }
         console.log(`${this.teacherName}가 교무실로 돌아가셨습니다.`);
-        $gamelog.innerHTML += `<p>${this.teacherName}가 교무실로 돌아가셨습니다.</p>`
+        $gamelog.innerHTML += `<p>${this.teacherName}가 교무실로 돌아가셨습니다.</p>`;
         this.reset();
-        
+
       }
 
     }
@@ -269,7 +282,7 @@ class Game {
           if (this.player.mp >= 5) {
             this.teacher.hp -= this.player.att * 2;
             this.player.mp -= 5;
-            console.log(`${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"}  "스킬: 발작"을 시전해 ${this.teacherName}에게 ${this.player.att * 2}의 피해를 입혔습니다.`); 
+            console.log(`${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"}  "스킬: 발작"을 시전해 ${this.teacherName}에게 ${this.player.att * 2}의 피해를 입혔습니다.`);
             console.log(`${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}`);
             log[1] = -this.player.att * 2;
             detail[turn] = `${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"}  "스킬: 발작"을 시전해 ${this.teacherName}에게 ${this.player.att * 2}의 피해를 입혔습니다. ${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}
@@ -277,8 +290,18 @@ class Game {
             if (this.teacher.hp > 0) {
               this.teachersCounterAttack();
             } else { // 사망 시
+              const a = document.createElement("p");
+              a.id = `${turn}`;
+              a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
+              $gamelog.append(a);
+              detail[turn] += `<p>${teacherName}가 교무실로 돌아가셨습니다.</p>`
+              if ($details.innerText.indexOf("[세부사항]") !== -1) {
+                $details.innerText = `[세부사항]
+                ` + detail[a.id] + `
+                세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
+              }
+              $gamelog.innerHTML += `<p>${teacherName}가 교무실로 돌아가셨습니다.</p>`;
               console.log(`${teacherName}가 교무실로 돌아가셨습니다.`);
-              $gamelog.innerHTML += `<p>${teacherName}가 교무실로 돌아가셨습니다.</p>`
               this.reset();
             }
           } else {
@@ -291,7 +314,9 @@ class Game {
         default:
       }
     }
-    if (this.teacherName === "뽄수") {
+
+
+    if (this.teacherName === "뽄수") { // 본수 함수
       this.teachersCounterAttack = () => { // -1: 없음 0: 뒷목 꼬집기, 1: 청소
         let teacherSkillCode = Math.floor(Math.random() * 100) + 1; //20% 확률로 일반 공격 시전
         if (teacherSkillCode <= 20) {
@@ -326,7 +351,7 @@ class Game {
             this.teacher.mp -= 10;
             console.log(`${this.teacherName}가 "액티브 스킬: 너 청소"를 시전해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}에게 5턴간 "청소" 효과를 적용했습니다.`);
             detail[turn] += `${this.teacherName}가 "액티브 스킬: 너 청소"를 시전해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}에게 5턴간 "청소" 효과를 적용했습니다.
-            ` 
+            `
           } else if (teacherSkillCode === -1) {
             console.log(`${this.teacherName}의 기력이 부족해 스킬을 시전하려다 말았습니다.`);
             log[0] = 0;
@@ -359,9 +384,20 @@ class Game {
         a.id = `${turn}`;
         a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
         $gamelog.append(a);
+        if ($details.innerText.indexOf("[세부사항]") !== -1) {
+          $details.innerText = `[세부사항]
+      ` + detail[a.id] + `
+      세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
+        }
         if (this.player.hp <= 0) {
-          console.log(`${this.teacherName}는 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했다!`);
-          $gamelog.innerHTML += `${this.teacherName}는 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했다!`
+          if ($details.innerText.indexOf("[세부사항]") !== -1) {
+            $details.innerText = `[세부사항]
+            ` + detail[a.id] + `${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!
+            세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.
+            `;
+          }
+          console.log(`${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`);
+          $gamelog.innerHTML += `${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`
           this.reset();
         }
       }
