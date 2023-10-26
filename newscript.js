@@ -10,6 +10,7 @@ let turn = 0;
 let log = [null, null]; //플레이어 체력 변동, 선생 체력 변동
 let detail = [];
 let player; //플레이어 정보가 담긴 객체, json으로 변환 후 저장
+let showOrDelete = 0; //0: 보이기, 1: 숨기기
 const playerStats = {
   lv1: {
     maxHp: 150,
@@ -166,12 +167,19 @@ class Game {
   }
   gameStarts() {
     $input.addEventListener('submit', this.playerInput);
-    $gamelog.addEventListener('mousedown', this.showDetails);
-    $gamelog.addEventListener('mouseup', this.deleteDetails);
+    $gamelog.addEventListener('click', this.showDetails);
   }
-  showDetails = (event) => { $details.innerText = `[세부사항]
-  ` + detail[event.target.id] };
-  deleteDetails = () => { $details.innerText = ''; }
+  showDetails = (event) => {
+    if(showOrDelete === 0) {
+      $details.innerText = `[세부사항]
+    ` + detail[event.target.id] + `
+    세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`
+    showOrDelete = 1;
+  } else {
+    $details.innerHTML = `세부사항을 보려면 로그를 클릭해 주세요.`;
+    showOrDelete = 0;
+  }
+    }
   playerInput = event => {
     event.preventDefault();
     const $playerInput = event.target[1];
@@ -187,6 +195,7 @@ class Game {
           console.log("이미 플레이 중입니다.");
         }
       } else if (msg === "공격") {
+        $details.innerHTML = `세부사항을 보려면 로그를 클릭해 주세요.`
         turn++;
         console.log(`${turn}턴 시작`);
         this.whenAA();
@@ -199,6 +208,7 @@ class Game {
         if (this.player.mp < 5) {
           console.log(`마나가 부족합니다. 현재 마나: ${this.player.mp}`);
         } else {
+          $details.innerHTML = `세부사항을 보려면 로그를 클릭해 주세요.`
           turn++;
           console.log(`${turn}턴 시작`);
           this.whenUseSkill(0);
@@ -207,6 +217,8 @@ class Game {
       } else if (msg === "청소째기") {
         console.log("사용할 수 없는 스킬입니다.");
         // this.whenUseSkill(1);
+      } else {
+
       }
     }
     $playerInput.value = '';
@@ -244,10 +256,11 @@ class Game {
         this.teachersCounterAttack();
       } else { // 사망 시
         console.log(`${this.teacherName}가 교무실로 돌아가셨습니다.`);
-        $gamelog.innerHTML += `<p>${teacherName}가 교무실로 돌아가셨습니다.</p>`
+        $gamelog.innerHTML += `<p>${this.teacherName}가 교무실로 돌아가셨습니다.</p>`
         this.reset();
         
       }
+
     }
     //스킬
     this.whenUseSkill = playerSkillCode => { // 발작: 0, 청소째기: 1, 늦잠: 2
@@ -344,7 +357,7 @@ class Game {
         }
         const a = document.createElement("p");
         a.id = `${turn}`;
-        a.innerHTML = `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
+        a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
         $gamelog.append(a);
         if (this.player.hp <= 0) {
           console.log(`${this.teacherName}는 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했다!`);
