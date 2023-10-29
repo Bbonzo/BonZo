@@ -242,7 +242,7 @@ class Game {
   battle = () => {
     const teacherCodes = { 0: "BonSu", 1: "DoRan" };
     // const randomTeacherCode = teacherCodes[Math.floor(Math.random() * 2)];
-    const randomTeacherCode = teacherCodes[1];
+    const randomTeacherCode = teacherCodes[Math.floor(Math.random() * 2)];
     this.teacher = new Teacher(this, randomTeacherCode, 1);
     this.teacher.hp = this.teacher.maxHp;
     this.teacher.maxMp = this.teacher.mp;
