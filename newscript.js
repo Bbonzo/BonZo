@@ -14,7 +14,7 @@ let turn = 0;
 let log = [null, null]; //플레이어 체력 변동, 선생 체력 변동
 let detail = [];
 let player; //플레이어 정보가 담긴 객체, json으로 변환 후 저장
-let showOrDelete = 0; //0: 보이기, 1: 숨기기
+let showOrDelete = 1; //0: 보이기, 1: 숨기기
 const playerStats = {
   lv1: {
     maxHp: 150,
