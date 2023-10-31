@@ -7,35 +7,46 @@
   <title>뽄조</title>
   <script src="//cdn.jsdelivr.net/npm/eruda"></script>
   <script>eruda.init();</script>
+  <style>
+    footer {
+      width: 100%;
+      height: 100px;
+      /* footer의 높이 */
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      color:gray
+    }
+  </style>
 </head>
 
 <body>
   <center>
-    <img src="logo2.jpg" width="494" height="200">
+    <a href="/tutorial.html"><img src="logo2.jpg" width="494" height="200"></a>
     <!-- <h1 style="display:inline">뽄</h1>siuu<h1 style="display:inline">조</h1>지기  -->
     <div id="start">
       <form id="player-name" style="margin:50px">
         <input placeholder="닉네임을 입력하세요.">
-      <button>확인</button><br>
-      <span id="wrong-input" style="color: red;"></span>
+        <button>확인</button><br>
+        <span id="wrong-input" style="color: red;"></span>
       </form>
     </div>
     <form id="player-input" style="display: none; margin:50px">
       <div id="game-log">
-        
+
       </div>
       <select id="select-command">
         <option value="command">!</option>
         <option value="info">$</option>
       </select>
       <input id="command" placeholder="명령어를 입력하세요.">
-    <button>확인</button><br>
-    <div id="details">
-      
-    </div>
+      <button>확인</button><br>
+      <div id="details">
+
+      </div>
     </form>
+    <footer>ⓒ 2023. Heedo all rights reserved.</footer>
   </center>
-  
 
   <script src="newscript.js"></script>
 </body>
