@@ -41,12 +41,12 @@ const teachers = {
     },
     lv2: {
       maxHp: 250,
-      att: 20,
+      att: 25,
       mp: 30,
     },
     lv3: {
       hp: 300,
-      att: 25,
+      att: 30,
       mp: 35,
     },
   },
@@ -190,14 +190,19 @@ class Game {
       if (showOrDelete === 0) {
         $details.innerText = `[세부사항]
       ` + detail[event.target.id] + `
-      세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`
+      세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
         showOrDelete = 1;
       } else {
         $details.innerHTML = `세부사항을 보려면 로그를 클릭해 주세요.`;
         showOrDelete = 0;
       }
     } else {
-      $details.innerHTML = `이번 턴에는 특별한 전달사항이 없습니다.`;
+      if (!detail[turn]) {
+        detail[turn] = '게임이 시작되지 않았습니다.';
+      }
+      $details.innerHTML = $details.innerText = `[세부사항]
+      ` + detail[turn] + `
+      세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
       showOrDelete = 1;
     }
   }
@@ -243,7 +248,7 @@ class Game {
           this.whenUseSkill(0);
         }
       } else if (msg === "청소째기") {
-        if (this.player.level > 2) {
+        if (this.player.level >= 2) {
           if (this.player.mp < 5) {
             log(`마나가 부족합니다. 현재 마나: ${this.player.mp}`);
           } else if (this.player.library) {
@@ -299,7 +304,7 @@ class Game {
       }
       this.teacherName = this.teacher.name === "BonSu" ? "뽄수" : "도란이";
       console.log(`${this.teacher.level}레벨 ${this.teacherName}를 만났다.`);
-      $gamelog.innerHTML += `${this.teacher.level}레벨 ${this.teacherName}를 만났다.`
+      $gamelog.innerHTML += `${this.teacher.level}레벨 ${this.teacherName}를 만났다.<p>`
       this.player.cleaning = 0;
       this.player.blink = 0;
       this.player.checked = 0;
@@ -308,36 +313,36 @@ class Game {
     this.whenAA = () => { // 일반 공격
       this.teacher.hp -= this.player.att;
       gameLog(`${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} ${this.teacherName}를 공격해 ${this.player.att}의 피해를 입혔습니다. ${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}`);
-      if (this.player.level >= 2) {
-        if (this.player.maxMp >= this.player.mp + 1) { //마나에서 1을 회복해도 최대 마나보다 작거나 같다면
-          this.player.mp += 1;
-          gameLog(`${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 패시브 "비행 청소년"으로 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나가 1 회복되었습니다. ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나: ${this.player.mp}/${this.player.maxMp}`);
-        }
-        // else if (this.player.maxMp > this.player.mp) { //현재 마나가 최대 마나보다 작고 마나에서 1을 회복하면 최대 마나를 초과한다면
-        //   mpRegen = this.player.maxMp - this.player.mp;
-        //   this.player.mp += mpRegen;
-        //   console.log(`${this.playerName}의 패시브 "기능성 사복"으로 ${this.playerName}의 마나가 ${mpRegen} 회복되었습니다.`);
-        //   console.log(`${this.playerName}의 마나: ${this.player.mp}/${this.player.maxMp}`);
-        // }
-      }
       if (this.teacher.hp > 0) {
+        if (this.player.level >= 2) {
+          if (this.player.maxMp >= this.player.mp + 1) { //마나에서 1을 회복해도 최대 마나보다 작거나 같다면
+            this.player.mp += 1;
+            gameLog(`${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 패시브 "비행 청소년"으로 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나가 1 회복되었습니다. ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나: ${this.player.mp}/${this.player.maxMp}`);
+          }
+          // else if (this.player.maxMp > this.player.mp) { //현재 마나가 최대 마나보다 작고 마나에서 1을 회복하면 최대 마나를 초과한다면
+          //   mpRegen = this.player.maxMp - this.player.mp;
+          //   this.player.mp += mpRegen;
+          //   console.log(`${this.playerName}의 패시브 "기능성 사복"으로 ${this.playerName}의 마나가 ${mpRegen} 회복되었습니다.`);
+          //   console.log(`${this.playerName}의 마나: ${this.player.mp}/${this.player.maxMp}`);
+          // }
+        }
         this.counter();
       } else { // 사망 시
         const a = document.createElement("p");
         a.id = `${turn}`;
         a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
         $gamelog.append(a);
-        detail[turn] += `${this.teacherName}가 교무실로 돌아가셨습니다.`;
+        gameLog(`${this.teacherName}가 교무실로 돌아가셨습니다.`);
+        log(`${this.teacherName}가 교무실로 돌아가셨습니다.
+        `);
         if (showOrDelete === 1) {
           $details.innerText = `[세부사항]
                 ` + detail[a.id] + `
                 세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
         }
-        log(`${this.teacherName}가 교무실로 돌아가셨습니다.`);
         exp += 1;
         this.levelup();
         this.reset();
-
       }
 
     }
@@ -349,19 +354,19 @@ class Game {
             this.teacher.hp -= this.player.att * 2;
             this.player.mp -= 5;
             gameLog(`${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"}  "스킬: 발작"을 시전해 ${this.teacherName}에게 ${this.player.att * 2}의 피해를 입혔습니다. ${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}`);
-            if (this.player.level >= 2) {
-              if (this.player.maxMp >= this.player.mp + 1) { //마나에서 1을 회복해도 최대 마나보다 작거나 같다면
-                this.player.mp += 1;
-                gameLog(`${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 패시브 "비행 청소년"으로 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나가 1 회복되었습니다. ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나: ${this.player.mp}/${this.player.maxMp}`);
-              }
-              // else if (this.player.maxMp > this.player.mp) { //현재 마나가 최대 마나보다 작고 마나에서 1을 회복하면 최대 마나를 초과한다면
-              //   mpRegen = this.player.maxMp - this.player.mp;
-              //   this.player.mp += mpRegen;
-              //   console.log(`${this.playerName}의 패시브 "기능성 사복"으로 ${this.playerName}의 마나가 ${mpRegen} 회복되었습니다.`);
-              //   console.log(`${this.playerName}의 마나: ${this.player.mp}/${this.player.maxMp}`);
-              // }
-            }
             if (this.teacher.hp > 0) {
+              if (this.player.level >= 2) {
+                if (this.player.maxMp >= this.player.mp + 1) { //마나에서 1을 회복해도 최대 마나보다 작거나 같다면
+                  this.player.mp += 1;
+                  gameLog(`${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 패시브 "비행 청소년"으로 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나가 1 회복되었습니다. ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나: ${this.player.mp}/${this.player.maxMp}`);
+                }
+                // else if (this.player.maxMp > this.player.mp) { //현재 마나가 최대 마나보다 작고 마나에서 1을 회복하면 최대 마나를 초과한다면
+                //   mpRegen = this.player.maxMp - this.player.mp;
+                //   this.player.mp += mpRegen;
+                //   console.log(`${this.playerName}의 패시브 "기능성 사복"으로 ${this.playerName}의 마나가 ${mpRegen} 회복되었습니다.`);
+                //   console.log(`${this.playerName}의 마나: ${this.player.mp}/${this.player.maxMp}`);
+                // }
+              }
               this.counter();
             } else { // 사망 시
               const a = document.createElement("p");
@@ -398,19 +403,19 @@ class Game {
                 gameLog(`${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"}  "스킬: 청소째기"를 시전해 파란 노트에 적힌 "체크" 표시를 제거하고 ${this.teacherName}에게 ${this.player.att * 1.5}의 피해를 입혔습니다. ${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}`);
               }
             }
-            if (this.player.level >= 2) {
-              if (this.player.maxMp >= this.player.mp + 1) { //마나에서 1을 회복해도 최대 마나보다 작거나 같다면
-                this.player.mp += 1;
-                gameLog(`${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 패시브 "비행 청소년"으로 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나가 1 회복되었습니다. ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나: ${this.player.mp}/${this.player.maxMp}`);
-              }
-              // else if (this.player.maxMp > this.player.mp) { //현재 마나가 최대 마나보다 작고 마나에서 1을 회복하면 최대 마나를 초과한다면
-              //   mpRegen = this.player.maxMp - this.player.mp;
-              //   this.player.mp += mpRegen;
-              //   console.log(`${this.playerName}의 패시브 "기능성 사복"으로 ${this.playerName}의 마나가 ${mpRegen} 회복되었습니다.`);
-              //   console.log(`${this.playerName}의 마나: ${this.player.mp}/${this.player.maxMp}`);
-              // }
-            }
             if (this.teacher.hp > 0) {
+              if (this.player.level >= 2) {
+                if (this.player.maxMp >= this.player.mp + 1) { //마나에서 1을 회복해도 최대 마나보다 작거나 같다면
+                  this.player.mp += 1;
+                  gameLog(`${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 패시브 "비행 청소년"으로 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나가 1 회복되었습니다. ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}의 마나: ${this.player.mp}/${this.player.maxMp}`);
+                }
+                // else if (this.player.maxMp > this.player.mp) { //현재 마나가 최대 마나보다 작고 마나에서 1을 회복하면 최대 마나를 초과한다면
+                //   mpRegen = this.player.maxMp - this.player.mp;
+                //   this.player.mp += mpRegen;
+                //   console.log(`${this.playerName}의 패시브 "기능성 사복"으로 ${this.playerName}의 마나가 ${mpRegen} 회복되었습니다.`);
+                //   console.log(`${this.playerName}의 마나: ${this.player.mp}/${this.player.maxMp}`);
+                // }
+              }
               this.counter();
             } else { // 사망 시
               const a = document.createElement("p");
@@ -513,40 +518,45 @@ class Game {
             gameLog(`${this.teacherName}의 기력이 부족해 스킬을 시전하려다 말았습니다.`);
           }
         }
-        if (this.teacher.maxMp >= this.teacher.mp + 2) { //마나에서 2를 회복해도 최대 마나보다 작거나 같다면
-          this.teacher.mp += 2;
-          gameLog(`${this.teacherName}의 패시브 "기능성 사복"으로 ${this.teacherName}의 마나가 2 회복되었습니다. ${this.teacherName}의 마나: ${this.teacher.mp}/${this.teacher.maxMp}`);
-        } else if (this.teacher.maxMp > this.teacher.mp) { //현재 마나가 최대 마나보다 작고 마나에서 2를 회복하면 최대 마나를 초과한다면
-          mpRegen = this.teacher.maxMp - this.teacher.mp;
-          this.teacher.mp += mpRegen;
-          gameLog(`${this.teacherName}의 패시브 "기능성 사복"으로 ${this.teacherName}의 마나가 ${mpRegen} 회복되었습니다. ${this.teacherName}의 마나: ${this.teacher.mp}/${this.teacher.maxMp}`);
-        }
-        if (this.player.cleaning > 0) {
-          this.player.cleaning -= 1;
-          this.player.hp -= this.teacher.att * 0.6;
-          gameLog(`${this.teacherName}의 "청소" 효과로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} ${this.player.att * 0.6}의 피해를 입었습니다. 청소 효과가 ${this.player.cleaning !== 0 ? `${this.player.cleaning}턴 남았습니다.` : "제거되었습니다."} ${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}`);
-        }
-        if (this.player.blink) {
-          this.player.blink -= 1;
-          gameLog(`${this.teacherName}의 "깜지" 효과로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} 행동 불능 상태에 빠졌습니다. 깜지 효과가 ${this.player.blink + 1}턴 남았습니다.}`);
-          this.counter(1);
-          return;
-        }
-        const a = document.createElement("p");
-        a.id = `${turn}`;
-        a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
-        $gamelog.append(a);
-        if (showOrDelete === 1) {
-          $details.innerText = `[세부사항]
-      ` + detail[a.id] + `
-      세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
-        }
-        if (this.player.hp <= 0) {
+        if (this.player.hp > 0) {
+          if (this.teacher.maxMp >= this.teacher.mp + 2) { //마나에서 2를 회복해도 최대 마나보다 작거나 같다면
+            this.teacher.mp += 2;
+            gameLog(`${this.teacherName}의 패시브 "기능성 사복"으로 ${this.teacherName}의 마나가 2 회복되었습니다. ${this.teacherName}의 마나: ${this.teacher.mp}/${this.teacher.maxMp}`);
+          } else if (this.teacher.maxMp > this.teacher.mp) { //현재 마나가 최대 마나보다 작고 마나에서 2를 회복하면 최대 마나를 초과한다면
+            mpRegen = this.teacher.maxMp - this.teacher.mp;
+            this.teacher.mp += mpRegen;
+            gameLog(`${this.teacherName}의 패시브 "기능성 사복"으로 ${this.teacherName}의 마나가 ${mpRegen} 회복되었습니다. ${this.teacherName}의 마나: ${this.teacher.mp}/${this.teacher.maxMp}`);
+          }
+          if (this.player.cleaning > 0) {
+            this.player.cleaning -= 1;
+            this.player.hp -= this.teacher.att * 0.6;
+            gameLog(`${this.teacherName}의 "청소" 효과로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} ${this.player.att * 0.6}의 피해를 입었습니다. 청소 효과가 ${this.player.cleaning !== 0 ? `${this.player.cleaning}턴 남았습니다.` : "제거되었습니다."} ${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}`);
+          }
+          if (this.player.blink) {
+            this.player.blink -= 1;
+            gameLog(`${this.teacherName}의 "깜지" 효과로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} 행동 불능 상태에 빠졌습니다. 깜지 효과가 ${this.player.blink + 1}턴 남았습니다.}`);
+            this.counter(1);
+            return;
+          }
+          const a = document.createElement("p");
+          a.id = `${turn}`;
+          a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
+          $gamelog.append(a);
           if (showOrDelete === 1) {
             $details.innerText = `[세부사항]
-            ` + detail[a.id] + `${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!
-            세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.
-            `;
+        ` + detail[a.id] + `
+        세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
+          }
+        } else {
+          gameLog(`${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`);
+          const a = document.createElement("p");
+          a.id = `${turn}`;
+          a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
+          $gamelog.append(a);
+          if (showOrDelete === 1) {
+            $details.innerText = `[세부사항]
+        ` + detail[a.id] + `
+        세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
           }
           log(`${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`);
           this.reset();
@@ -598,40 +608,45 @@ class Game {
             gameLog(`${this.teacherName}가 "일반 공격: 잔소리"를 시전해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}에게 ${this.teacher.att}의 피해를 입혔습니다. ${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}`);
           }
         }
-        if (this.player.checked === 3) {
-          this.player.checked = 0;
-          this.player.hp -= this.player.maxHp * 0.2;
-          if (this.teacher.hp + this.player.maxHp * 0.2 >= this.teacher.maxHp) { //회복된 값이 최대 체력보다 크거나 같다면
-            hpRegen = this.teacher.maxHp - this.teacher.hp;
-            this.teacher.hp += hpRegen;
-          } else {
-            hpRegen = this.player.maxHp * 0.2;
-            this.teacher.hp += hpRegen;
+        if (this.player.hp > 0) {
+          if (this.player.checked === 3) {
+            this.player.checked = 0;
+            this.player.hp -= this.player.maxHp * 0.2;
+            if (this.teacher.hp + this.player.maxHp * 0.2 >= this.teacher.maxHp) { //회복된 값이 최대 체력보다 크거나 같다면
+              hpRegen = this.teacher.maxHp - this.teacher.hp;
+              this.teacher.hp += hpRegen;
+            } else {
+              hpRegen = this.player.maxHp * 0.2;
+              this.teacher.hp += hpRegen;
+            }
+            gameLog(`${this.teacherName}의 "체크" 3회 누적으로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} ${this.player.maxHp * 0.2}의 피해를 입고 ${this.teacherName}의 체력이 ${hpRegen}만큼 회복되었습니다.`);
+            gameLog(`${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}, ${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}`);
           }
-          gameLog(`${this.teacherName}의 "체크" 3회 누적으로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} ${this.player.maxHp * 0.2}의 피해를 입고 ${this.teacherName}의 체력이 ${hpRegen}만큼 회복되었습니다.`);
-          gameLog(`${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}, ${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}`);
-        }
-        if (this.player.library) {
-          this.player.library -= 1;
           if (this.player.library) {
-            gameLog(`${this.teacherName}의 "독서실 분위기"로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} 스킬을 사용할 수 없습니다. ${this.player.library}턴 남았습니다.`);
+            this.player.library -= 1;
+            if (this.player.library) {
+              gameLog(`${this.teacherName}의 "독서실 분위기"로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} 스킬을 사용할 수 없습니다. ${this.player.library}턴 남았습니다.`);
+            }
           }
-        }
-        const a = document.createElement("p");
-        a.id = `${turn}`;
-        a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
-        $gamelog.append(a);
-        if (showOrDelete === 1) {
-          $details.innerText = `[세부사항]
-      ` + detail[a.id] + `
-      세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
-        }
-        if (this.player.hp <= 0) {
+          const a = document.createElement("p");
+          a.id = `${turn}`;
+          a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
+          $gamelog.append(a);
           if (showOrDelete === 1) {
             $details.innerText = `[세부사항]
-            ` + detail[a.id] + `${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!
-            세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.
-            `;
+        ` + detail[a.id] + `
+        세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
+          }
+        } else {
+          gameLog(`${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`);
+          const a = document.createElement("p");
+          a.id = `${turn}`;
+          a.innerHTML += `${turn}턴: ${this.player.class} ${this.player.hp}/${this.player.maxHp}, ${this.teacherName} ${this.teacher.hp}/${this.teacher.maxHp}`;
+          $gamelog.append(a);
+          if (showOrDelete === 1) {
+            $details.innerText = `[세부사항]
+          ` + detail[a.id] + `
+          세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
           }
           console.log(`${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`);
           $gamelog.innerHTML += `${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`
