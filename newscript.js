@@ -1,5 +1,3 @@
-//게임, 게임 시작, 공격, 스킬, 몬스터 공격, 레벨업, 스탯 표시, 게임 종료
-//만들 것: 도란이 추가, 플레이어 레벨업 기능 구현
 const $input = document.querySelector("#player-input");
 const $name = document.querySelector("#player-name");
 const $WrongInput = document.querySelector("#wrong-input");
