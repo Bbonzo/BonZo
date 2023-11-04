@@ -265,6 +265,12 @@ class Game {
           log(`아직 "청소째기" 스킬이 해금되지 않았습니다. 해금 레벨: 2 현재 레벨: ${this.player.level}`);
         }
 
+      } else if (msg === "전투종료") {
+        if (showOrDelete === 1) {
+          $details.innerText = `${this.teacherName}와의 전투에서 도망쳤습니다!`;
+        }
+        log(`전투를 종료하였습니다.`);
+        this.reset();
       } else {
 
       }
