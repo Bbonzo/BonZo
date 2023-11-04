@@ -8,7 +8,7 @@ const $details = document.querySelector("#details");
 let playerName = null;
 let game = null;
 let exp = 0;
-let lev = 2;
+let lev = 1;
 const $commands = a = document.querySelector("#select-command");
 let mpRegen, hpRegen = 0;
 let turn = 0;
@@ -284,7 +284,7 @@ class Game {
     { // 세팅
       const teacherCodes = { 0: "BonSu", 1: "DoRan" };
       // const randomTeacherCode = teacherCodes[Math.floor(Math.random() * 2)];
-      const randomTeacherCode = teacherCodes[1];
+      const randomTeacherCode = teacherCodes[Math.floor(Math.random() * 2)];
       this.teacher = new Teacher(this, randomTeacherCode, lev);
       this.teacher.hp = this.teacher.maxHp;
       this.teacher.maxMp = this.teacher.mp;
