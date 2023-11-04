@@ -164,7 +164,7 @@ class Teacher extends Unit {
 };
 const log = content => {
   console.log(content);
-  $gamelog.innerHTML += content;
+  $gamelog.innerHTML += `${content}<br>`;
 }
 const gameLog = content => {
   console.log(content);
@@ -183,13 +183,12 @@ class Game {
 
   gameStarts() {
     $input.addEventListener('submit', this.playerInput);
-    $gamelog.addEventListener('click', this.showDetails);
   }
   showDetails = (event) => {
-    if (detail[event.target.id]) {
+    if (detail[turn]) {
       if (showOrDelete === 0) {
         $details.innerText = `[세부사항]
-      ` + detail[event.target.id] + `
+      ` + detail[turn] + `
       세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
         showOrDelete = 1;
       } else {
@@ -200,9 +199,9 @@ class Game {
       if (!detail[turn]) {
         detail[turn] = '게임이 시작되지 않았습니다.';
       }
-      $details.innerHTML = $details.innerText = `[세부사항]
+      $details.innerHTML = $details.innerText = `[세부사항]<br>
       ` + detail[turn] + `
-      세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
+      <br>세부사항을 숨기려면 로그를 한 번 더 클릭해 주세요.`;
       showOrDelete = 1;
     }
   }
@@ -308,6 +307,7 @@ class Game {
       if (this.player.item.state !== "unlocked") {
         console.log("무기 어캐했노");
       }
+      $gamelog.addEventListener('click', this.showDetails);
       this.teacherName = this.teacher.name === "BonSu" ? "뽄수" : "도란이";
       console.log(`${this.teacher.level}레벨 ${this.teacherName}를 만났다.`);
       $gamelog.innerHTML += `${this.teacher.level}레벨 ${this.teacherName}를 만났다.<p>`
@@ -336,7 +336,7 @@ class Game {
       } else { // 사망 시
         const a = document.createElement("p");
         a.id = `${turn}`;
-        a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<p>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+        a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
         $gamelog.append(a);
         gameLog(`${this.teacherName}가 교무실로 돌아가셨습니다.`);
         log(`${this.teacherName}가 교무실로 돌아가셨습니다.
@@ -377,7 +377,7 @@ class Game {
             } else { // 사망 시
               const a = document.createElement("p");
               a.id = `${turn}`;
-              a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<p>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+              a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
               $gamelog.append(a);
               detail[turn] += `${this.teacherName}가 교무실로 돌아가셨습니다.`;
               if (showOrDelete === 1) {
@@ -426,7 +426,7 @@ class Game {
             } else { // 사망 시
               const a = document.createElement("p");
               a.id = `${turn}`;
-              a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<p>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+              a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
               $gamelog.append(a);
               detail[turn] += `${this.teacherName}가 교무실로 돌아가셨습니다.`;
               if (showOrDelete === 1) {
@@ -546,7 +546,7 @@ class Game {
           }
           const a = document.createElement("p");
           a.id = `${turn}`;
-          a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<p>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+          a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
           $gamelog.append(a);
           if (showOrDelete === 1) {
             $details.innerText = `[세부사항]
@@ -557,7 +557,7 @@ class Game {
           gameLog(`${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`);
           const a = document.createElement("p");
           a.id = `${turn}`;
-          a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<p>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+          a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
           $gamelog.append(a);
           if (showOrDelete === 1) {
             $details.innerText = `[세부사항]
@@ -636,7 +636,7 @@ class Game {
           }
           const a = document.createElement("p");
           a.id = `${turn}`;
-          a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<p>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+          a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
           $gamelog.append(a);
           if (showOrDelete === 1) {
             $details.innerText = `[세부사항]
@@ -647,7 +647,7 @@ class Game {
           gameLog(`${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`);
           const a = document.createElement("p");
           a.id = `${turn}`;
-          a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<p>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+          a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
           $gamelog.append(a);
           if (showOrDelete === 1) {
             $details.innerText = `[세부사항]
@@ -666,8 +666,7 @@ class Game {
   reset = () => {
     this.teacher = null;
     this.player = null;
-    turn = 0;
-    $gamelog.removeEventListener('mouseover', this.showDetails);
+    $gamelog.removeEventListener('click', this.showDetails);
   }
 };
 
