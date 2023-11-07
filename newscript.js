@@ -309,6 +309,7 @@ class Game {
       this.teacherName = this.teacher.name === "BonSu" ? "뽄수" : "도란이";
       console.log(`${this.teacher.level}레벨 ${this.teacherName}를 만났다.`);
       $gamelog.innerHTML += `${this.teacher.level}레벨 ${this.teacherName}를 만났다.<p>`
+      turn = 0;
       this.player.cleaning = 0;
       this.player.blink = 0;
       this.player.checked = 0;
