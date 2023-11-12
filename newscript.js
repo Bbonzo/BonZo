@@ -776,7 +776,7 @@ class Game {
           if (this.player.cleaning > 0) {
             if (this.isAttIgnored === 1) {
               this.player.cleaning -= 1;
-              gameLog(`${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} 청소도 회피했습니다!`);
+              gameLog(`${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} 청소를 회피했습니다!`);
             } else if (this.isAttIgnored === 0) {
               this.player.cleaning -= 1;
               this.player.hp -= this.teacher.att * 0.6 * 0.75;
@@ -853,31 +853,25 @@ class Game {
         }
         if (this.player.hp > 0) {
           if (this.player.checked === 3) {
-            if (this.isAttIgnored === 0) {
+            if (this.isAttIgnored === 1) {
               this.player.checked = 0;
-              this.player.hp -= this.player.maxHp * 0.2 * 0.75;
-              if (this.teacher.hp + this.player.maxHp * 0.2 * 0.75 >= this.teacher.maxHp) { //회복된 값이 최대 체력보다 크거나 같다면
-                hpRegen = this.teacher.maxHp - this.teacher.hp;
-                this.teacher.hp += hpRegen;
-              } else {
-                hpRegen = this.player.maxHp * 0.2 * 0.75;
-                this.teacher.hp += hpRegen;
-              }
-              gameLog(`${this.teacherName}의 "체크" 3회 누적으로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} ${this.player.maxHp * 0.2 * 0.75}의 피해를 입고 ${this.teacherName}의 체력이 ${hpRegen}만큼 회복되었습니다.`);
-              gameLog(`${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}, ${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}`);
+              gameLog(`${this.teacherName}의 "체크"가 3회 누적되었습니다.
+              ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} 체크로 인한 성찰교실 송치를 회피했습니다!`);
             } else {
               this.player.checked = 0;
-              this.player.hp -= this.player.maxHp * 0.2;
-              if (this.teacher.hp + this.player.maxHp * 0.2 >= this.teacher.maxHp) { //회복된 값이 최대 체력보다 크거나 같다면
+              const damage = this.player.oversleep !== 0 ? this.player.maxHp * 0.2 * (1 - thisSkill.reduceDamage) : this.player.maxHp * 0.2
+              this.player.hp -= damage;
+              if (this.teacher.hp + damage >= this.teacher.maxHp) { //회복된 값이 최대 체력보다 크거나 같다면
                 hpRegen = this.teacher.maxHp - this.teacher.hp;
                 this.teacher.hp += hpRegen;
               } else {
-                hpRegen = this.player.maxHp * 0.2;
+                hpRegen = damage;
                 this.teacher.hp += hpRegen;
               }
               gameLog(`${this.teacherName}의 "체크" 3회 누적으로 인해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} ${this.player.maxHp * 0.2}의 피해를 입고 ${this.teacherName}의 체력이 ${hpRegen}만큼 회복되었습니다.`);
               gameLog(`${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}, ${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}`);
             }
+
           }
           if (this.player.library) {
             this.player.library -= 1;
