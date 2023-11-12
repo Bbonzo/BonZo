@@ -500,6 +500,7 @@ class Game {
     }
     this.whenAA = () => { // 일반 공격
       this.teacher.hp -= this.player.att;
+      this.teacher.rage += 1;
       gameLog(`${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} ${this.teacherName}를 공격해 ${this.player.att}의 피해를 입혔습니다. ${this.teacherName}의 체력: ${this.teacher.hp}/${this.teacher.maxHp}`);
       if (this.teacher.hp > 0) {
         this.playerPassive();
@@ -513,6 +514,7 @@ class Game {
       const skill = this.player.skill[skillName];
       const thisSkill = skillList[skillName][skill.level];
       let damage = 0;
+      this.teacher.rage += 1 + skill.level;
       if (skillName === "발작") {
         if (skill.isUpgraded) {
           damage = this.player.att * thisSkill.upgradedCoefficient + thisSkill.upgradedAdded;
@@ -586,7 +588,11 @@ class Game {
     this.whenTeacherDie = () => {
       const a = document.createElement("p");
       a.id = `${turn}`;
-      a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+      if (this.teacher.level >= 3) {
+        a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp} 분노: ${this.teacher.rage}`;
+      } else {
+        a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+      }
       $gamelog.append(a);
       detail += `${this.teacherName}가 교무실로 돌아가셨습니다.`;
       if (showOrDelete === 1) {
@@ -602,7 +608,11 @@ class Game {
     this.whenPlayerDie = () => {
       gameLog(`${this.teacherName}가 ${this.player.class === "땡땡이" ? "땡땡이를" : "전동훈을"} 살해했습니다!`);
       const a = document.createElement("p");
-      a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+      if (this.teacher.level >= 3) {
+        a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp} 분노: ${this.teacher.rage}`;
+      } else {
+        a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+      }
       $gamelog.append(a);
       if (showOrDelete === 1) {
         $details.innerText = `[세부사항]
@@ -614,7 +624,11 @@ class Game {
     }
     this.updateLog = () => {
       const a = document.createElement("p");
-      a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+      if (this.teacher.level >= 3) {
+        a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp} 분노: ${this.teacher.rage}`;
+      } else {
+        a.innerHTML += `${turn}턴: ${this.player.class} 체력: ${this.player.hp}/${this.player.maxHp} 마나: ${this.player.mp}/${this.player.maxMp}<br>${this.teacherName} 체력: ${this.teacher.hp}/${this.teacher.maxHp} 마나: ${this.teacher.mp}/${this.teacher.maxMp}`;
+      }
       $gamelog.append(a);
       if (showOrDelete === 1) {
         $details.innerText = `[세부사항]
@@ -785,7 +799,7 @@ class Game {
           }
           this.updateLog();
         }
-        if (player.hp <= 0) {
+        if (this.player.hp <= 0) {
           this.whenPlayerDie();
         }
       }
@@ -877,7 +891,7 @@ class Game {
           }
           this.updateLog();
         }
-        if (player.hp <= 0) {
+        if (this.player.hp <= 0) {
           this.whenPlayerDie();
         }
       }
