@@ -622,6 +622,7 @@ class Game {
       // const damage = this.teacher.att * tThisSkill.basicCoefficient;
       if (this.player.oversleep !== 0) {
         if (thisSkill.ignoreLate * 100 > Math.floor(Math.random() * 100)) {
+          this.teacher.mp -= tThisSkill.requiredMp;
           gameLog(`${this.teacherName}가 ${this.checkName(skillName)} 시전했습니다.
           ${this.player.class === "땡땡이" ? "땡땡이가" : "전동훈이"} 공격을 회피했습니다!`);
           if (debfName) {
@@ -630,10 +631,10 @@ class Game {
           return;
         }
       }
-      if (skillName === "두 손가락 찌르기") {
+      if (skillName === "두 손가락 찌르기" || "잔소리") {
         const damage = this.player.oversleep !== 0 ? this.teacher.att * tThisSkill.basicCoefficient * (1 - thisSkill.reduceDamage) : this.teacher.att * tThisSkill.basicCoefficient;
         this.player.hp -= damage;
-        gameLog(`${this.teacherName}가 "일반 공격: 두 손가락 찌르기"를 시전해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}에게 ${damage}의 피해를 입혔습니다. ${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}`);
+        gameLog(`${this.teacherName}가 "일반 공격: ${skillName}"를 시전해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}에게 ${damage}의 피해를 입혔습니다. ${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}`);
       } else if (skillName === "뒷목 꼬집기") {
         const damage = this.player.oversleep !== 0 ? this.teacher.att * tThisSkill.basicCoefficient * (1 - thisSkill.reduceDamage) : this.teacher.att * tThisSkill.basicCoefficient;
         this.player.hp -= damage;
@@ -647,10 +648,6 @@ class Game {
         this.teacher.mp -= tThisSkill.requiredMp;
         this.player.blink = tThisSkill.last;
         gameLog(`${this.teacherName}가 "액티브 스킬: 특별한 전달사항"을 시전해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}에게 ${tThisSkill.last}턴간 "깜지" 효과를 적용했습니다.`);
-      } else if (skillName === "잔소리") {
-        const damage = this.player.oversleep !== 0 ? this.teacher.att * tThisSkill.basicCoefficient * (1 - thisSkill.reduceDamage) : this.teacher.att * tThisSkill.basicCoefficient;
-        this.player.hp -= damage;
-        gameLog(`${this.teacherName}가 "일반 공격: 잔소리"를 시전해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}에게 ${damage}의 피해를 입혔습니다. ${this.player.class}의 체력: ${this.player.hp}/${this.player.maxHp}`);
       } else if (skillName === "체크") {
         const damage = this.player.oversleep !== 0 ? this.teacher.att * tThisSkill.basicCoefficient * (1 - thisSkill.reduceDamage) : this.teacher.att * tThisSkill.basicCoefficient;
         this.player.hp -= damage;
@@ -662,8 +659,6 @@ class Game {
         this.teacher.mp -= tThisSkill.requiredMp; // 마나 초과 회복은 신경 안써도 됨
         gameLog(`${this.teacherName}가 "액티브 스킬: 독서실 분위기"를 시전해 ${playerName}의 ${this.player.class === "땡땡이" ? "땡땡이" : "전동훈"}에게 ${tThisSkill.last}턴간 "독서실 분위기" 효과를 적용하고 ${this.teacherName}의 기력을 5만큼 회복했습니다. ${this.teacherName}의 기력: ${this.teacher.mp}/${this.teacher.maxMp}`);
       }
-
-
     }
     if (this.teacherName === "뽄수") { // 본수 함수
       this.counter = (isBonusTurn = 0) => { // 보너스 턴: 플레이어가 기절한 상태인가? -1: 없음 0: 뒷목 꼬집기, 1: 청소, 2: 깜지(원콤낼 수 있을 때만 시전)
@@ -723,14 +718,12 @@ class Game {
           if (isBonusTurn) {
             teacherSkillCode = 0;
           }
-
-
           if (teacherSkillCode === 0) { // 뒷목
             this.whenAttIgnored("뒷목 꼬집기");
           } else if (teacherSkillCode === 1) { // 청소
-            this.whenAttIgnored("너 청소");
+            this.whenAttIgnored("너 청소", "청소");
           } else if (teacherSkillCode === 2) { // 깜지
-            this.whenAttIgnored("특별한 전달사항");
+            this.whenAttIgnored("특별한 전달사항", "깜지");
           } else if (teacherSkillCode === -1) {
             gameLog(`${this.teacherName}의 기력이 부족해 스킬을 시전하려다 말았습니다.`);
           }
@@ -809,7 +802,7 @@ class Game {
           teacherSkillCode = 40;
         }
         if (teacherSkillCode <= 30) {
-          this.whenAttIgnored("뒷목 꼬집기");
+          this.whenAttIgnored("잔소리");
         } else if (teacherSkillCode > 30) {
           if (this.teacher.level === 1) {
             if (this.teacher.mp >= 5) {
@@ -831,11 +824,11 @@ class Game {
             }
           }
           if (teacherSkillCode === 0) { // 체크
-            this.whenAttIgnored("체크");
+            this.whenAttIgnored("체크", "체크");
           } else if (teacherSkillCode === 1) {
-            this.whenAttIgnored("독서실 분위기");
+            this.whenAttIgnored("독서실 분위기", "침묵");
           } else if (teacherSkillCode === -1) {
-            this.whenAttIgnored("뒷목 꼬집기");
+            this.whenAttIgnored("잔소리");
           }
         }
         if (this.player.hp > 0) {
